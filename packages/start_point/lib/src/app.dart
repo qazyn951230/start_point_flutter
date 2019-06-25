@@ -19,3 +19,21 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+import 'package:flutter/widgets.dart';
+
+class StartApp extends StatefulWidget {
+  const StartApp({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _StartAppState createState() => _StartAppState();
+}
+
+class _StartAppState extends State<StartApp> {
+  @override
+  Widget build(BuildContext context) {
+    return null;
+  }
+}
