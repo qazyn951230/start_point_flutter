@@ -74,11 +74,11 @@ static BOOL isMainQueue() {
 }
 
 - (void)pickImageToResult:(FlutterResult)result {
+    [self prepareForNextResult:result];
     if (![UIImagePickerController isSourceTypeAvailable:_sourceType]) {
         [self sendResult:nil];
         return;
     }
-    [self prepareForNextResult:result];
     if (_sourceType == UIImagePickerControllerSourceTypeCamera) {
         [self checkVideoStatusThen:^{
             [self doPickImage];
@@ -91,11 +91,11 @@ static BOOL isMainQueue() {
 }
 
 - (void)pickVideoToResult:(FlutterResult)result {
+    [self prepareForNextResult:result];
     if (![UIImagePickerController isSourceTypeAvailable:_sourceType]) {
         [self sendResult:nil];
         return;
     }
-    [self prepareForNextResult:result];
     if (_sourceType == UIImagePickerControllerSourceTypeCamera) {
         [self checkVideoAudioStatusThen:^{
             [self doPickVideo];
@@ -129,7 +129,9 @@ static BOOL isMainQueue() {
 }
 
 - (void)prepareForNextResult:(FlutterResult)result {
-    [self sendError:@"multiple_request" message:@"Cancelled by a second request"];
+    if (_result) {
+        [self sendError:@"multiple_request" message:@"Cancelled by a second request"];
+    }
     _result = result;
 }
 
