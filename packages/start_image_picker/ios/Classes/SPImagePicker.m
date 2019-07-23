@@ -74,6 +74,10 @@ static BOOL isMainQueue() {
 }
 
 - (void)pickImageToResult:(FlutterResult)result {
+    if (![UIImagePickerController isSourceTypeAvailable:_sourceType]) {
+        [self sendResult:nil];
+        return;
+    }
     [self prepareForNextResult:result];
     if (_sourceType == UIImagePickerControllerSourceTypeCamera) {
         [self checkVideoStatusThen:^{
@@ -87,6 +91,10 @@ static BOOL isMainQueue() {
 }
 
 - (void)pickVideoToResult:(FlutterResult)result {
+    if (![UIImagePickerController isSourceTypeAvailable:_sourceType]) {
+        [self sendResult:nil];
+        return;
+    }
     [self prepareForNextResult:result];
     if (_sourceType == UIImagePickerControllerSourceTypeCamera) {
         [self checkVideoAudioStatusThen:^{
