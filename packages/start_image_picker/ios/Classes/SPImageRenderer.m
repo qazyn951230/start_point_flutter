@@ -35,12 +35,12 @@
     }
     CGSize size = image.size;
     if (width > 0.99) {
-        if (height > 0.99) {
+        if (height > 0.99) { // width >= 1 && height >= 1
             size = CGSizeMake(width, height);
-        } else { // height < 1
+        } else { // width >= 1 && height < 1 => height
             size = CGSizeMake(width, ih / iw * width);
         }
-    } else { // width < 1
+    } else if (height > 0.99) { // height >= 1 && width < 1 => width
         size = CGSizeMake(iw / ih * height, height);
     }
     size = CGSizeMake(round(size.width), round(size.height));
@@ -51,7 +51,7 @@
     format.scale = image.scale;
     UIGraphicsImageRenderer *render = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
     return [render JPEGDataWithCompressionQuality:1.0 actions:^(UIGraphicsImageRendererContext *context) {
-        [image drawAtPoint:CGPointZero];
+        [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
     }];
 }
 

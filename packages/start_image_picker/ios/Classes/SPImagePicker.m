@@ -32,7 +32,7 @@ static void onMainQueue(dispatch_block_t block) {
 }
 
 static BOOL isMainQueue() {
-    return pthread_main_np() == 0;
+    return pthread_main_np() != 0;
 }
 
 @interface SPImagePicker () <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
@@ -45,9 +45,11 @@ static BOOL isMainQueue() {
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _sourceType = UIImagePickerControllerSourceTypeCamera;
+        _sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         _maximumWidth = 0;
         _maximumHeight = 0;
+        _videoQuality = UIImagePickerControllerQualityTypeMedium;
+        _videoMaximumDuration = 600;
         _viewController = UIApplication.sharedApplication.keyWindow.rootViewController;
     }
     return self;
@@ -57,21 +59,29 @@ static BOOL isMainQueue() {
     [self sendError:@"plugin_dealloc" message:@"Dealloc before get result"];
 }
 
+- (BOOL)hasResult {
+    return _result != nil;
+}
+
 - (void)reset {
-    _sourceType = UIImagePickerControllerSourceTypeCamera;
+    assert(_result == nil);
+    _sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     _maximumWidth = 0;
     _maximumHeight = 0;
+    _videoQuality = UIImagePickerControllerQualityTypeMedium;
+    _videoMaximumDuration = 600;
+    _viewController = UIApplication.sharedApplication.keyWindow.rootViewController;
 }
 
 - (void)pickImageToResult:(FlutterResult)result {
     [self prepareForNextResult:result];
     if (_sourceType == UIImagePickerControllerSourceTypeCamera) {
         [self checkVideoStatusThen:^{
-            [self doPickImageToResult:result];
+            [self doPickImage];
         }];
     } else {
         [self checkPhotoLibraryStatusThen:^{
-            [self doPickImageToResult:result];
+            [self doPickImage];
         }];
     }
 }
@@ -80,26 +90,34 @@ static BOOL isMainQueue() {
     [self prepareForNextResult:result];
     if (_sourceType == UIImagePickerControllerSourceTypeCamera) {
         [self checkVideoAudioStatusThen:^{
-            [self doPickVideoToResult:result];
+            [self doPickVideo];
         }];
     } else {
         [self checkPhotoLibraryStatusThen:^{
-            [self doPickVideoToResult:result];
+            [self doPickVideo];
         }];
     }
 }
 
-- (void)doPickImageToResult:(FlutterResult)result {
+- (void)doPickImage {
     assert(isMainQueue());
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
-    picker.mediaTypes = @[(__bridge NSString *) kUTTypeJPEG,
-        (__bridge NSString *) kUTTypeJPEG2000, (__bridge NSString *) kUTTypePNG];
+    picker.sourceType = _sourceType;
+    picker.mediaTypes = @[(__bridge NSString *) kUTTypeImage];
     [_viewController presentViewController:picker animated:YES completion:nil];
 }
 
-- (void)doPickVideoToResult:(FlutterResult)result {
+- (void)doPickVideo {
     assert(isMainQueue());
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.delegate = self;
+    picker.sourceType = _sourceType;
+    picker.mediaTypes = @[(__bridge NSString *) kUTTypeVideo, (__bridge NSString *) kUTTypeMovie,
+                          (__bridge NSString *) kUTTypeMPEG4, (__bridge NSString *) kUTTypeAVIMovie];
+    picker.videoQuality = _videoQuality;
+    picker.videoMaximumDuration = _videoMaximumDuration;
+    [_viewController presentViewController:picker animated:YES completion:nil];
 }
 
 - (void)prepareForNextResult:(FlutterResult)result {
@@ -195,13 +213,21 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> 
     if (_result == nil) {
         return;
     }
-    UIImage *image = info[UIImagePickerControllerEditedImage] ?: info[UIImagePickerControllerOriginalImage];
-    NSData * data = [SPImageRenderer renderImage:image width:_maximumWidth height:_maximumHeight];
-    if (data != nil) {
-        NSString *path = [SPImagePicker saveImage:data];
-        [self sendResult:path];
+    NSString *type = info[UIImagePickerControllerMediaType];
+    BOOL isImage = [type isEqualToString:(__bridge NSString *) kUTTypeImage];
+    if (isImage) {
+        UIImage *image = info[UIImagePickerControllerEditedImage] ?: info[UIImagePickerControllerOriginalImage];
+        NSData *data = [SPImageRenderer renderImage:image width:_maximumWidth height:_maximumHeight];
+        if (data != nil) {
+            NSString *path = [SPImagePicker saveImage:data];
+            [self sendResult:path];
+        } else {
+            [self sendResult:nil];
+        }
     } else {
-        [self sendResult:nil];
+        NSURL *url = info[UIImagePickerControllerMediaURL];
+        NSString *path = [SPImagePicker saveVideoFromURL:url];
+        [self sendResult:path];
     }
 }
 
@@ -210,7 +236,8 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> 
     [self sendResult:nil];
 }
 
-#pragma MARK - Save Image to Disk
+#pragma MARK - Save Image or Video to Disk
+
 + (NSString *)saveImage:(NSData *)image {
     NSFileManager *manager = [NSFileManager defaultManager];
     NSString *directory = NSTemporaryDirectory();
@@ -218,6 +245,19 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> 
     NSString *filename = NSProcessInfo.processInfo.globallyUniqueString;
     NSURL *url = [[[NSURL alloc] initFileURLWithPath:directory] URLByAppendingPathComponent:filename];
     return [image writeToURL:url atomically:YES] ? url.path : nil;
+}
+
++ (NSString *)saveVideoFromURL:(NSURL *)url {
+    NSFileManager *manager = [NSFileManager defaultManager];
+    if (!(url && [manager fileExistsAtPath:url.path])) {
+        return nil;
+    }
+    NSString *directory = NSTemporaryDirectory();
+    [manager createDirectoryAtPath:directory withIntermediateDirectories:NO attributes:nil error:nil];
+    NSString *filename = NSProcessInfo.processInfo.globallyUniqueString;
+    NSURL *toUrl = [[[NSURL alloc] initFileURLWithPath:directory] URLByAppendingPathComponent:filename];
+    BOOL result = [manager copyItemAtURL:url toURL:toUrl error:nil];
+    return result ? url.path : nil;
 }
 
 @end

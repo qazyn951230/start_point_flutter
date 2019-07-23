@@ -28,8 +28,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SPImagePicker : NSObject
 
 @property(nonatomic, assign) UIImagePickerControllerSourceType sourceType;
+
+// image
 @property(nonatomic, assign) CGFloat maximumWidth;
 @property(nonatomic, assign) CGFloat maximumHeight;
+
+// video
+@property(nonatomic, assign) UIImagePickerControllerQualityType videoQuality;
+@property(nonatomic, assign) NSTimeInterval videoMaximumDuration;
+
+@property(readonly) BOOL hasResult;
 
 - (void)reset;
 

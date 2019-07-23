@@ -1,13 +1,15 @@
+import 'dart:io' show File;
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:start_image_picker/start_image_picker.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('start_image_picker');
+  const MethodChannel channel = MethodChannel('plugins.undev.com/image_picker');
 
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
+      return '/foobar';
     });
   });
 
@@ -15,7 +17,8 @@ void main() {
     channel.setMockMethodCallHandler(null);
   });
 
-  test('getPlatformVersion', () async {
-    expect(await StartImagePicker.platformVersion, '42');
+  test('pickImage', () async {
+    final file = await ImagePicker.pickImage(source: ImageSource.camera);
+    expect(file.path, '/foobar');
   });
 }
