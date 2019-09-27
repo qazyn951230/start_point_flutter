@@ -20,32 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-library start_point;
-
-export 'src/action_sheet.dart';
-export 'src/constants.dart';
-export 'src/page_scaffold.dart';
-export 'src/slider.dart';
-export 'src/text_theme.dart';
-export 'src/activity_indicator.dart';
-export 'src/date_picker.dart';
-export 'src/picker.dart';
-export 'src/switch.dart';
-export 'src/theme.dart';
-export 'src/app.dart';
-export 'src/dialog.dart';
-export 'src/refresh.dart';
-export 'src/tab_scaffold.dart';
-export 'src/thumb_painter.dart';
-export 'src/bottom_tab_bar.dart';
-export 'src/icons.dart';
-export 'src/route.dart';
-export 'src/tab_view.dart';
-export 'src/button.dart';
-export 'src/localizations.dart';
-export 'src/scrollbar.dart';
-export 'src/text_field.dart';
-export 'src/colors.dart';
-export 'src/nav_bar.dart';
-export 'src/segmented_control.dart';
-export 'src/text_selection.dart';
+//import 'package:flutter/painting.dart';
+//
+//import 'colors.dart';
+//
+//class ThumbPainter {
+//  ThumbPainter({
+//    this.color = Colors.white,
+//    this.shadowColor = const Color(0x2C000000),
+//  }) : _shadowPaint = BoxShadow(
+//          color: shadowColor,
+//          blurRadius: 1.0,
+//        ).toPaint();
+//
+//  final Color color;
+//
+//  final Color shadowColor;
+//
+//  final Paint _shadowPaint;
+//
+//  static const double radius = 14.0;
+//
+//  static const double extension = 7.0;
+//
+//  void paint(Canvas canvas, Rect rect) {
+//    final RRect rrect = RRect.fromRectAndRadius(
+//      rect,
+//      Radius.circular(rect.shortestSide / 2.0),
+//    );
+//
+//    canvas.drawRRect(rrect, _shadowPaint);
+//    canvas.drawRRect(rrect.shift(const Offset(0.0, 3.0)), _shadowPaint);
+//    canvas.drawRRect(rrect, Paint()..color = color);
+//  }
+//}

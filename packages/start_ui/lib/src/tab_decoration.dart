@@ -20,32 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-library start_point;
+import 'dart:ui' show Canvas, Size, Offset;
 
-export 'src/action_sheet.dart';
-export 'src/constants.dart';
-export 'src/page_scaffold.dart';
-export 'src/slider.dart';
-export 'src/text_theme.dart';
-export 'src/activity_indicator.dart';
-export 'src/date_picker.dart';
-export 'src/picker.dart';
-export 'src/switch.dart';
-export 'src/theme.dart';
-export 'src/app.dart';
-export 'src/dialog.dart';
-export 'src/refresh.dart';
-export 'src/tab_scaffold.dart';
-export 'src/thumb_painter.dart';
-export 'src/bottom_tab_bar.dart';
-export 'src/icons.dart';
-export 'src/route.dart';
-export 'src/tab_view.dart';
-export 'src/button.dart';
-export 'src/localizations.dart';
-export 'src/scrollbar.dart';
-export 'src/text_field.dart';
-export 'src/colors.dart';
-export 'src/nav_bar.dart';
-export 'src/segmented_control.dart';
-export 'src/text_selection.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show BuildContext;
+
+abstract class TabPainterDelegate {
+  bool isIndexChanging();
+  int currentIndex();
+  double currentProgress();
+  int tabCount();
+  double tabWidth(int index);
+  double labelWidth(int index);
+  bool shouldRepaint();
+}
+
+abstract class TabDecoration {
+  const TabDecoration();
+
+  TabPainter createTabPainter(TabPainterDelegate delegate,
+      [VoidCallback onChanged]);
+
+  TabDecoration resolve(BuildContext context) => this;
+}
+
+abstract class TabPainter {
+  const TabPainter(this.delegate, [this.onChanged]) : assert(delegate != null);
+
+  final TabPainterDelegate delegate;
+  final VoidCallback onChanged;
+
+  void paint(Canvas canvas, Offset offset, Size size);
+
+  @mustCallSuper
+  void dispose() {}
+}

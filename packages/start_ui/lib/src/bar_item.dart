@@ -20,32 +20,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-library start_point;
+import 'package:flutter/widgets.dart';
 
-export 'src/action_sheet.dart';
-export 'src/constants.dart';
-export 'src/page_scaffold.dart';
-export 'src/slider.dart';
-export 'src/text_theme.dart';
-export 'src/activity_indicator.dart';
-export 'src/date_picker.dart';
-export 'src/picker.dart';
-export 'src/switch.dart';
-export 'src/theme.dart';
-export 'src/app.dart';
-export 'src/dialog.dart';
-export 'src/refresh.dart';
-export 'src/tab_scaffold.dart';
-export 'src/thumb_painter.dart';
-export 'src/bottom_tab_bar.dart';
-export 'src/icons.dart';
-export 'src/route.dart';
-export 'src/tab_view.dart';
-export 'src/button.dart';
-export 'src/localizations.dart';
-export 'src/scrollbar.dart';
-export 'src/text_field.dart';
-export 'src/colors.dart';
-export 'src/nav_bar.dart';
-export 'src/segmented_control.dart';
-export 'src/text_selection.dart';
+class BarButtonItem {
+  const BarButtonItem.custom(this.child)
+      : builder = null,
+        icon = null,
+        image = null,
+        title = null;
+
+  const BarButtonItem.builder(this.builder)
+      : child = null,
+        icon = null,
+        image = null,
+        title = null;
+
+  const BarButtonItem.icon(this.icon)
+      : builder = null,
+        child = null,
+        image = null,
+        title = null;
+
+  const BarButtonItem.image(this.image)
+      : builder = null,
+        child = null,
+        icon = null,
+        title = null;
+
+  const BarButtonItem.text(this.title)
+      : builder = null,
+        child = null,
+        icon = null,
+        image = null;
+
+  final Widget child;
+  final WidgetBuilder builder;
+  final Widget icon;
+  final Widget image;
+  final Widget title;
+}

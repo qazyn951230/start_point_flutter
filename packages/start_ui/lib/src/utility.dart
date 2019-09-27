@@ -20,32 +20,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-library start_point;
+import 'package:flutter/painting.dart';
 
-export 'src/action_sheet.dart';
-export 'src/constants.dart';
-export 'src/page_scaffold.dart';
-export 'src/slider.dart';
-export 'src/text_theme.dart';
-export 'src/activity_indicator.dart';
-export 'src/date_picker.dart';
-export 'src/picker.dart';
-export 'src/switch.dart';
-export 'src/theme.dart';
-export 'src/app.dart';
-export 'src/dialog.dart';
-export 'src/refresh.dart';
-export 'src/tab_scaffold.dart';
-export 'src/thumb_painter.dart';
-export 'src/bottom_tab_bar.dart';
-export 'src/icons.dart';
-export 'src/route.dart';
-export 'src/tab_view.dart';
-export 'src/button.dart';
-export 'src/localizations.dart';
-export 'src/scrollbar.dart';
-export 'src/text_field.dart';
-export 'src/colors.dart';
-export 'src/nav_bar.dart';
-export 'src/segmented_control.dart';
-export 'src/text_selection.dart';
+import 'theme.dart';
+
+// TODO: Move borderColor to bar theme
+Border resolveBorder(Border border, ThemeData theme) {
+  if (border == null) {
+    return null;
+  }
+  return Border(
+    top: resolveBorderSide(border.top, theme),
+    bottom: resolveBorderSide(border.bottom, theme),
+    left: resolveBorderSide(border.left, theme),
+    right: resolveBorderSide(border.right, theme),
+  );
+}
+
+BorderSide resolveBorderSide(BorderSide borderSide, ThemeData theme) {
+  if (borderSide?.style == BorderStyle.solid) {
+    return borderSide.copyWith(
+      color: theme.borderColor,
+    );
+  }
+  return borderSide;
+}
+
+Color resolveColorAlpha(Color color, bool opaque) {
+  if (opaque && color?.alpha != 0xFF) {
+    return color.withAlpha(255);
+  }
+  return color;
+}
